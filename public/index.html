@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Professional RNG Panel</title>
+<style>
+body{margin:0;font-family:Inter,Arial;background:#0b0f14;color:#e5e7eb}
+.header{padding:12px 20px;border-bottom:1px solid #1f2937;display:flex;justify-content:space-between}
+.card{background:#111827;border:1px solid #1f2937;border-radius:10px;padding:20px;margin:20px}
+.countdown{font-size:48px;font-weight:600;text-align:center}
+.result{font-size:64px;font-weight:700;text-align:center;margin-top:10px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid #1f2937;padding:8px;text-align:center}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>SERVER STATUS: LIVE</div>
+  <div id="time">--:--:--</div>
+</div>
+
+<div class="card">
+  <div class="countdown">ROUND ENDS IN <span id="cd">--</span></div>
+  <div class="result" id="res">WAITING</div>
+</div>
+
+<div class="card">
+  <h3>HISTORY</h3>
+  <table class="table">
+    <thead><tr><th>PERIOD</th><th>RESULT</th></tr></thead>
+    <tbody id="hist"></tbody>
+  </table>
+</div>
+
+<script>
+async function tick(){
+  const r = await fetch('/api/state');
+  const d = await r.json();
+  document.getElementById('time').innerText = d.time;
+  document.getElementById('cd').innerText = 59 - d.seconds;
+  document.getElementById('res').innerText = d.currentNumber ?? 'WAITING';
+  const h = document.getElementById('hist');
+  h.innerHTML = '';
+  d.history.forEach(x=>{
+    h.innerHTML += `<tr><td>${x.period}</td><td>${x.number}</td></tr>`;
+  });
+}
+setInterval(tick,1000);
+tick();
+</script>
+</body>
+</html>
